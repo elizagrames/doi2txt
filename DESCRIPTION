@@ -1,13 +1,13 @@
 Package: doi2txt
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Download Full Text of Scientific Articles for Data Extraction
+Version: 0.0.0.1
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Eliza",
+           family = "Grames",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           email = "eliza.grames@uconn.edu",
+           comment = c(ORCID = "0000-0003-1743-6815"))
 Description: What the package does (one paragraph).
-License: What license it uses
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
