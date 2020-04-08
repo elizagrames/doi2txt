@@ -1,13 +1,36 @@
 Package: doi2txt
 Title: Download Full Text of Scientific Articles for Data Extraction
 Version: 0.0.0.1
-Authors@R: 
+Authors@R: c(
     person(given = "Eliza",
            family = "Grames",
            role = c("aut", "cre"),
            email = "eliza.grames@uconn.edu",
            comment = c(ORCID = "0000-0003-1743-6815"))
-Description: What the package does (one paragraph).
+    person(given = "Gabby",
+           family = "Palomo",
+           role = c("aut"))
+    person(given = "Matt",
+           family = "Grainger",
+           role = c("aut"))
+    person(given = "Neal",
+           family = "Haddaway",
+           role = c("aut"))
+           )
+Description: Screening articles for evidence synthesis is typically 
+             done using titles and abstracts, however, full text screening 
+             can be more efficient because there is no guessing involved 
+             when assessing if the methods of a study match inclusion criteria. 
+             Full text of articles is also necessary for coding article metadata, 
+             such as study location or types of data collected, or for analysing 
+             article content, such as with topic modelling. doi2txt facilitates
+             full text article screening, coding, and analysis by retrieving
+             plain text versions of journal articles based on a doi, if available,
+             or bibliographic information such as title and authors when a doi
+             is not available or known. It also contains functions for processing
+             full text articles, such as coding articles from an ontology of
+             topics, or geocoding articles to get actual or approximate 
+             latitude and longitude.
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
