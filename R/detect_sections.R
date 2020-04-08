@@ -54,3 +54,8 @@ detect_section <- function(section, text) {
 
 # It would also be good to detect reference lists and convert them to useful bib or ris files
 # Though that is probably a problem for a later day and not part of the MVP
+
+
+
+# Functions to subset out the sections once they are detected ####
+
