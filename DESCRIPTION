@@ -6,16 +6,19 @@ Authors@R: c(
            family = "Grames",
            role = c("aut", "cre"),
            email = "eliza.grames@uconn.edu",
-           comment = c(ORCID = "0000-0003-1743-6815"))
-    person(given = "Gabby",
-           family = "Palomo",
-           role = c("aut"))
+           comment = c(ORCID = "0000-0003-1743-6815")),
     person(given = "Matt",
            family = "Grainger",
-           role = c("aut"))
+           role = c("aut")),
     person(given = "Neal",
            family = "Haddaway",
-           role = c("aut"))
+           role = c("aut")),
+    person(given = "Gabby",
+           family = "Palomo",
+           role = c("aut")),
+    person(given = "Martin",
+           family = "Westgate",
+           role = c("aut")),
            )
 Description: Screening articles for evidence synthesis is typically 
              done using titles and abstracts, however, full text screening 
