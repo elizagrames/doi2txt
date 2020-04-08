@@ -20,4 +20,8 @@ bib2html <- function(title=NULL, year=NULL, author=NULL){
 
 }
 
+search_lens <- function(title){
+
+}
+
 # Subfunctions that address various common scraping issues encountered ####
