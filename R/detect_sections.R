@@ -21,6 +21,9 @@ sections <- list(
   references = c("literature cited", "works cited", "references", "citations")
 )
 
+# this should probably be a subfunction that gets wrapped up in a bigger function to return all the section starts
+# that way it can be used for subsetting more efficiently
+
 #' Detect section headers in plain text journal articles
 #' @description Given a plain text journal article and a named section header, detects which line is most likely to be the section header. For example, section="methods" will return the line containing a header such as "Materials and Methods".
 #' @param section A string of length 1 naming the section to detect; options are introduction, methods, results, discussion, and references.
