@@ -21,21 +21,20 @@ sections <- list(
   references = c("literature cited", "works cited", "references", "citations")
 )
 
-# this should probably be a subfunction that gets wrapped up in a bigger function to return all the section starts
-# that way it can be used for subsetting more efficiently
+# some papers do not have a section header for the intro
 
 #' Detect section headers in plain text journal articles
 #' @description Given a plain text journal article and a named section header, detects which line is most likely to be the section header. For example, section="methods" will return the line containing a header such as "Materials and Methods".
 #' @param section A string of length 1 naming the section to detect; options are introduction, methods, results, discussion, and references.
 #' @param text A character vector containing the plain text of a journal article where each line represents one paragraph separated by line breaks.
 #' @return An integer containing the line number of the text that is most likely the start of the section.
-detect_section <- function(section, text) {
+find_section <- function(section, text) {
   lookup <- unlist(sections[which(names(sections) == section)])
 
   # figure out which lines match to the terms and how many characters they differ by
   candidates <- lapply(lookup, function(x) {
     z <- grep(x, text, ignore.case = TRUE)
-    rbind(z, nchar(lines[z]) - nchar(x))
+    rbind(z, nchar(text[z]) - nchar(x))
   })
 
   # extract only the best match for each term in the lookup vector
@@ -44,10 +43,22 @@ detect_section <- function(section, text) {
     }))
 
     # return the line number of the line that has the closest nchar to the lookup vector
-    best_guesses[1,which.min(best_guesses[2,])]
+    header <- best_guesses[1,which.min(best_guesses[2,])]
+    if(length(header)==0){
+      header <- NA
+    }
+    return(header)
 }
 
-
+#' Detect all major section headers in plain text journal articles
+#' @description Finds the lines in a plain text scientific journal article that correspond to the start of the introduction, methods, results, discussion, and references.
+#' @param text A character vector containing a scientific journal article in plain text format where each line represents one paragraph, section header, or other type of standalone text (e.g. a figure caption).
+#' @return A numeric vector of length 5 indicating the lines within the text that are the section headers for the introduction, methods, results, discussion, and literature cited sections, respectively.
+detect_sections <- function(text){
+  all_sections <- unlist(lapply(names(sections), function(x){
+    doi2txt::find_section(x, site)
+  }))
+}
 
 
 # Detect tables and figures ####
