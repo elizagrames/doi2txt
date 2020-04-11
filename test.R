@@ -38,8 +38,9 @@ url_to_text(url = url)
 
 
 
+#Add data folder and test.RDS file
 
-
+test <- readRDS("data/test.RDS")
 
 #Neals code
 # setwd("~/OneDrive - SEI/ESHackathon/4.Remote 2020/doi2txt")
@@ -48,6 +49,8 @@ url_to_text(url = url)
 # names(dois)
 # str(dois)
 # str(url)
+
+
 
 #save an HTML from a URL
 #url<-dois
