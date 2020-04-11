@@ -1,9 +1,53 @@
-setwd("~/OneDrive - SEI/ESHackathon/4.Remote 2020/doi2txt")
-dois<-read.csv(file.choose(),header=TRUE)
-attach(dois)
-names(dois)
-str(dois)
-str(url)
+
+
+#Starting to make Neals code function/functions
+
+# First one is Url to text - I have it printing the text out which is not very useful
+#- I will just expand the function but had a spare 5 minutes to begin to play!
+
+url_to_text<-function(url=url){
+  library(dplyr)
+  library(httr)
+  library(rvest)
+  library(htm2txt)
+
+  get_object<-GET(url)
+  cat(content(get_object, "text"), file="temp.html")
+
+
+  #html_object<-read_html(x)
+  #write_xml(html_object, file="temp.html")
+
+  #extract text from URL (no field codes)
+
+  text <- gettxt(url)
+  print(text)
+
+
+
+}
+
+#test url_to_text
+
+url<-"https://doi.org/10.1186/s13750-015-0044-5"
+
+url_to_text(url = url)
+
+
+
+
+
+
+
+
+
+#Neals code
+# setwd("~/OneDrive - SEI/ESHackathon/4.Remote 2020/doi2txt")
+# dois<-read.csv(file.choose(),header=TRUE)
+# attach(dois)
+# names(dois)
+# str(dois)
+# str(url)
 
 #save an HTML from a URL
 #url<-dois
