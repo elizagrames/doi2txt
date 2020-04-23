@@ -9,8 +9,14 @@ read_html <- function(doi=NULL, title=NULL, year=NULL, author=NULL){
 
 # Functions for scraping html from a doi ####
 
-doi2html <- function(doi){
-
+doi2html <- function(doi=NULL, url=NULL){
+  if(is.null(doi) & is.null(url)){
+    stop(print("Either a doi or a url must be supplied."))
+  }
+  if(is.null(url)){
+    url <- get_url(doi)
+  }
+  parse_html(url=url)
 }
 
 
