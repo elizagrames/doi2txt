@@ -8,16 +8,22 @@
 #' @description Removes html from a downloaded article by calling the htm2txt package.
 #' @param html A large string of length 1 containing the html for a journal article
 #' @return A character vector containing the plain text version of the input html document with paragraphs in separate lines.
-parse_html <- function(html=NULL, url=NULL) {
-  if(is.null(html) & is.null(url)){
+parse_html <- function(html = NULL, url = NULL) {
+  if (is.null(html) & is.null(url)) {
     stop(print("Either an html text file or a url must be supplied."))
   }
-  if(is.null(html)){
+  try(if (is.null(html)) {
     x <- htm2txt::gettxt(url)
-  }else{
+  } else{
     x <- htm2txt::htm2txt(html)
+  })
+
+  if (class(x) != "character") {
+    site <- NA
+  } else{
+    site <- doi2txt::clean_html(x)
   }
-  doi2txt::clean_html(x)
+  return(site)
 }
 
 # internal function to remove junk lines that appear when converting html to text
@@ -35,9 +41,8 @@ split_lines <- function(x) {
 
 # makes dois into a url
 # set up with lapply so it can be a bunch of dois, or just one
-get_url <- function(doi){
-  unlist(lapply(doi, function(x){
-    paste("https://doi.org/", x, sep="")
-    }))
+get_url <- function(doi) {
+  unlist(lapply(doi, function(x) {
+    paste("https://doi.org/", x, sep = "")
+  }))
 }
-

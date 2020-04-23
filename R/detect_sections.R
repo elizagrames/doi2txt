@@ -21,11 +21,11 @@ find_section <- function(section, text) {
 
   # extract only the best match for each term in the lookup vector
   best_guesses <- data.frame(lapply(candidates, function(x) {
-    x[, which.min(x[2,])]
+    x[, which.min(x[2, ])]
   }))
 
   # return the line number of the line that has the closest nchar to the lookup vector
-  header <- best_guesses[1, which.min(best_guesses[2,])]
+  header <- best_guesses[1, which.min(best_guesses[2, ])]
   if (length(header) == 0) {
     header <- NA
   }
@@ -37,9 +37,9 @@ find_section <- function(section, text) {
 #' @param text A character vector containing a scientific journal article in plain text format where each line represents one paragraph, section header, or other type of standalone text (e.g. a figure caption).
 #' @return A numeric vector of length 5 indicating the lines within the text that are the section headers for the introduction, methods, results, discussion, and literature cited sections, respectively.
 detect_sections <- function(text) {
-  starts <- unlist(lapply(names(sections), function(x) {
+  starts <- try(unlist(lapply(names(sections), function(x) {
     doi2txt::find_section(x, text)
-  }))
+  })))
   names(starts) <- names(sections)
   return(starts)
 }
@@ -59,19 +59,24 @@ detect_sections <- function(text) {
 
 extract_section <- function(text, section) {
   start <- doi2txt::find_section(section, text)
-  if(is.na(start)){
-    stop(print(paste("Unable to identify a section header for the", section, sep="")))
-  }
+  if (!is.na(start)) {
+    next_section <-
+      names(sections)[(which(names(doi2txt::sections) == section) + 1)]
 
-  next_section <- names(sections)[(which(names(doi2txt::sections) == section) + 1)]
-
-  # gonna need to make this more flexible for sections that were not detected in a document
-  # e.g. where do you cut off the methods section if you could not find results?
-  if(next_section %in% names(sections)){
-    end <- doi2txt::find_section(next_section, text) - 1
-  }else{end <- length(text)}
-  if(is.na(end)){
-    stop(print(paste("Unable to identify the end of", section, sep="")))
+    # gonna need to make this more flexible for sections that were not detected in a document
+    # e.g. where do you cut off the methods section if you could not find results?
+    if (next_section %in% names(sections)) {
+      end <- doi2txt::find_section(next_section, text) - 1
+    } else{
+      end <- length(text)
+    }
+    if (is.na(end)) {
+      stop(print(paste(
+        "Unable to identify the end of", section, sep = ""
+      )))
+    }
+    text[start:end]
+  } else{
+    NA
   }
-  text[start:end]
 }
