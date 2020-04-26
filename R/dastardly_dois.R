@@ -5,7 +5,7 @@
 #' Get a list of dastardly dois to cause problems in the doistext functions
 #' @description Using datacite website to extract dois that link to scientific publications (can we extend to reports?)
 #' @param limit A numerical value representing how many dois to return. This number will be larger than those returned because the function selects only the dois that lead to scientific articles
-#' @return A dataframe of dois
+#' @return A list of dois
 #data not all publications but might be useful in future (and for Living Norway)
 #devtools::install_github("ropensci/rdatacite")
 
