@@ -91,7 +91,12 @@ articles <- x
 # now for extract_section
 
 text <- articles
-start <- find_section("methods", text)
+section="methods"
+# I couldnt run this without adding in section = "methods" "Error in which(names(sections) == section) : object 'section' not found"
+
+start <- find_section(section, text)
+
+#start <- find_section("methods", text) # replaced methods with section
 
 next_section <- names(sections)[(which(names(doi2txt::sections) == section) + 1)]
 
