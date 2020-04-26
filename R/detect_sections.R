@@ -5,49 +5,44 @@
 
 # Detecting section headers ####
 
-
-# I will convert this to .rda later, but for now, here is a minimal lookup table for section headers
-
-sections <- list(
-  introduction = c("introduction", "background"),
-  methods = c(
-    "methods",
-    "methodology",
-    "materials and methods",
-    "material and methods"
-  ),
-  results = c("results", "results and conclusions"),
-  discussion = c("discussion", "conclusions"),
-  references = c("literature cited", "works cited", "references", "citations")
-)
-
-# this should probably be a subfunction that gets wrapped up in a bigger function to return all the section starts
-# that way it can be used for subsetting more efficiently
-
 #' Detect section headers in plain text journal articles
 #' @description Given a plain text journal article and a named section header, detects which line is most likely to be the section header. For example, section="methods" will return the line containing a header such as "Materials and Methods".
 #' @param section A string of length 1 naming the section to detect; options are introduction, methods, results, discussion, and references.
 #' @param text A character vector containing the plain text of a journal article where each line represents one paragraph separated by line breaks.
 #' @return An integer containing the line number of the text that is most likely the start of the section.
-detect_section <- function(section, text) {
+find_section <- function(section, text) {
   lookup <- unlist(sections[which(names(sections) == section)])
 
   # figure out which lines match to the terms and how many characters they differ by
   candidates <- lapply(lookup, function(x) {
     z <- grep(x, text, ignore.case = TRUE)
-    rbind(z, nchar(lines[z]) - nchar(x))
+    rbind(z, nchar(text[z]) - nchar(x))
   })
 
   # extract only the best match for each term in the lookup vector
-    best_guesses <- data.frame(lapply(candidates, function(x){
-      x[,which.min(x[2,])]
-    }))
+  best_guesses <- data.frame(lapply(candidates, function(x) {
+    x[, which.min(x[2, ])]
+  }))
 
-    # return the line number of the line that has the closest nchar to the lookup vector
-    best_guesses[1,which.min(best_guesses[2,])]
+  # return the line number of the line that has the closest nchar to the lookup vector
+  header <- best_guesses[1, which.min(best_guesses[2, ])]
+  if (length(header) == 0) {
+    header <- NA
+  }
+  return(header)
 }
 
-
+#' Detect all major section headers in plain text journal articles
+#' @description Finds the lines in a plain text scientific journal article that correspond to the start of the introduction, methods, results, discussion, and references.
+#' @param text A character vector containing a scientific journal article in plain text format where each line represents one paragraph, section header, or other type of standalone text (e.g. a figure caption).
+#' @return A numeric vector of length 5 indicating the lines within the text that are the section headers for the introduction, methods, results, discussion, and literature cited sections, respectively.
+detect_sections <- function(text) {
+  starts <- try(unlist(lapply(names(sections), function(x) {
+    doi2txt::find_section(x, text)
+  })))
+  names(starts) <- names(sections)
+  return(starts)
+}
 
 
 # Detect tables and figures ####
@@ -62,3 +57,26 @@ detect_section <- function(section, text) {
 
 # Functions to subset out the sections once they are detected ####
 
+extract_section <- function(text, section) {
+  start <- doi2txt::find_section(section, text)
+  if (!is.na(start)) {
+    next_section <-
+      names(sections)[(which(names(doi2txt::sections) == section) + 1)]
+
+    # gonna need to make this more flexible for sections that were not detected in a document
+    # e.g. where do you cut off the methods section if you could not find results?
+    if (next_section %in% names(sections)) {
+      end <- doi2txt::find_section(next_section, text) - 1
+    } else{
+      end <- length(text)
+    }
+    if (is.na(end)) {
+      stop(print(paste(
+        "Unable to identify the end of", section, sep = ""
+      )))
+    }
+    text[start:end]
+  } else{
+    NA
+  }
+}
