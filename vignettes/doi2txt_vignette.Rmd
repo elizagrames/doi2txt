@@ -56,7 +56,7 @@ dois <- c("10.1590/S1984-46702014000400006",
           "10.5751/ES-00018-010106",
           "10.1002/ecs2.1351")
 
-articles <- lapply(dois[1:4], doi2html)
+articles <- lapply(dois[5:13], doi2html)
 
 methods <- lapply(articles, extract_section, section="methods")
 
@@ -114,9 +114,9 @@ text[start:end]
 
 This is a graveyard for problems that need to be solved or complexities of downloading some articles. For example, html pages that cannot be rendered properly, hitting a sign-in screen, the actual article being an embedded pdf on an html site, needing to click through a link to get to the actual article, etc. Please be as specific as possible with problems, and preferably include an example of where doi2txt fails in regards to a particular problem with code to reproduce it. 
 
-## Placeholder for problem 1
+## Subscription issue
 
-Placeholder for problem 1 description
+The third doi (10.1016/j.cja.2014.04.019) leads to a paywalled HTML. The full text HTML is there, but I'm accessing it through a proxy. Can someone with a VPN or onsite license try?
 
 ```{r}
 
@@ -124,3 +124,6 @@ Placeholder for problem 1 description
 
 ```
 
+## No HTML available
+
+The fourth doi (10.24843/EJA.2019.v26.i01.p07) leads to an abstract but no HTML full text, just a PDF. It's for a rather obscure Indonesian language journal, so low priority.
