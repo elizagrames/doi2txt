@@ -1,3 +1,9 @@
+# Here is the code Neal came up with for redirects
+
+doi<-"https://doi.org/10.1016/j.envint.2015.07.011"
+newurl <- readLines(curl::curl(as.character(httr::GET(doi)[1])))[15]
+test<-gsub("%3A",":",gsub("%2F","/",newurl))
+doi<-gsub("^.*direct=\\s*|\\s*%3Fvia.*$", "", test)
 
 
 #Starting to make Neals code function/functions
@@ -215,3 +221,4 @@ doinum<-sub("https://doi.org/","",doi)
 pdfurl<-sub(" ","",paste("https://environmentalevidencejournal.biomedcentral.com/track/pdf/",doinum))
 destfile<-sub("/","_",doinum)
 download.file(pdfurl,paste(destfile,".pdf"))
+
