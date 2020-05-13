@@ -21,10 +21,16 @@ find_section <- function(section, text) {
 
 if(length(candidates)>0){
   # extract only the best match for each term in the lookup vector
-  best_guesses <- candidates[1, which(candidates[2,]==min(candidates[2,]))]
+  if(section=="abstract"){
+    best_guesses <- candidates[1,1] # always take the first instance for abstracts
+  }else{
+    best_guesses <- candidates[1, which(candidates[2,]==min(candidates[2,]))]
+  }
 
   if(length(best_guesses)>1){
     header <- best_guesses[length(best_guesses)]
+  }else{
+    header <- best_guesses
   }
   if (length(header) == 0) {
     header <- NA
@@ -52,6 +58,15 @@ detect_sections <- function(text) {
 }
 
 
+remove_junk <- function(text, min_char=50){
+  actual_content <- which(nchar(text)>min_char & !grepl("cookie", text))
+  startpoint <- min(actual_content[1]-1, actual_content)
+  endpoint <- max(actual_content[length(actual_content)]+1, actual_content)
+
+  text[startpoint:endpoint]
+}
+
+
 # Detect tables and figures ####
 
 # Tables and figures could appear embedded in other sections
@@ -64,41 +79,26 @@ detect_sections <- function(text) {
 
 # Functions to subset out the sections once they are detected ####
 
-extract_section <- function(text, section, max_lines=10) {
+extract_section <- function(text, section, max_lines=10, clean=TRUE) {
   endline <- NA
-  if(section=="abstract"){
-    output <- doi2txt::get_abstract(text)
-  }else{
+if(clean){
+  text <- doi2txt::remove_junk(text)
+}
+  headers <- doi2txt::detect_sections(text)
 
-  startline <- doi2txt::find_section(section, text)
-  if (!is.na(startline)) {
-    next_section <-
-      names(sections)[(which(names(doi2txt::sections) == section) + 1)]
+  startpoint <- headers[which(names(headers)==section)]
+  endpoint <- headers[which(names(headers)==section)+1]-1
 
-    # gonna need to make this more flexible for sections that were not detected in a document
-    # e.g. where do you cut off the methods section if you could not find results?
-    if (next_section %in% names(sections)) {
-      endline <- doi2txt::find_section(next_section, text) - 1
-    }
-    if(section=="references"){
-      endline <- length(text)
-    }
-    if (is.na(endline)) {
-      endline <- startline+max_lines
-      print(paste(
-        "Unable to identify the end of", section, "returning", max_lines, "lines following the start of", section, sep = " "
-      ))
-    }
-    output <- text[startline:endline]
-
-    if(section=="references"){
-# remove lines that don't have a 1 or 2 since those will appear in basically any reference publication year
-      # some things still sneak in, but this should deal with most issues
-      output <- output[sort(unique(c(grep(1, output), grep(2, output))))]
-    }
-  } else{
-    output <- NA
+  if(is.na(startpoint)){
+    stop(paste("Unable to identify start of", section))
   }
-  }
-  return(output)
+
+  if(is.na(endpoint)){
+    endpoint <- startpoint+max_lines
+    warning(paste(
+      "Unable to identify the end of ", section, ", returning ", max_lines, " lines following the start of ", section, ".", sep = ""
+    ))
+    }
+
+    text[startpoint:endpoint]
 }
