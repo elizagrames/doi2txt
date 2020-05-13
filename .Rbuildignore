@@ -1,7 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 test.R
-R/doi2abstract.R
+doi2abstract.R
 doi2txt.pdf
 doi2txt.pptx
 vignettes/

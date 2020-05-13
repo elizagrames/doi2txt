@@ -4,10 +4,10 @@
 \alias{parse_html}
 \title{Convert html to plain text}
 \usage{
-parse_html(htm)
+parse_html(html = NULL, url = NULL)
 }
 \arguments{
-\item{htm}{A large string of length 1 containing the html for a journal article}
+\item{html}{A large string of length 1 containing the html for a journal article}
 }
 \value{
 A character vector containing the plain text version of the input html document with paragraphs in separate lines.
