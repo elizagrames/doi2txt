@@ -15,6 +15,9 @@ parse_html <- function(html = NULL, url = NULL) {
   try(if (is.null(html)) {
     x <- htm2txt::gettxt(url)
   } else{
+    if(length(html)>1){
+      html <- paste(html, collapse=" ")
+    }
     x <- htm2txt::htm2txt(html)
   })
 
@@ -42,7 +45,5 @@ split_lines <- function(x) {
 # makes dois into a url
 # set up with lapply so it can be a bunch of dois, or just one
 get_url <- function(doi) {
-  unlist(lapply(doi, function(x) {
-    paste("https://doi.org/", x, sep = "")
-  }))
+    paste("https://doi.org/", doi, sep = "")
 }
