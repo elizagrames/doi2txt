@@ -47,3 +47,4 @@ split_lines <- function(x) {
 get_url <- function(doi) {
     paste("https://doi.org/", doi, sep = "")
 }
+
