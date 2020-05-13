@@ -81,6 +81,9 @@ remove_junk <- function(text, min_char=50){
 
 extract_section <- function(text, section, max_lines=10, clean=TRUE) {
   endline <- NA
+
+  # removes a bunch of random lines at the start and end of a document that are less than 50 characters, most of which are menu items
+  # otherwise, the "start" of each section is consecutive lines in a menu
 if(clean){
   text <- doi2txt::remove_junk(text)
 }
@@ -99,6 +102,5 @@ if(clean){
       "Unable to identify the end of ", section, ", returning ", max_lines, " lines following the start of ", section, ".", sep = ""
     ))
     }
-
     text[startpoint:endpoint]
 }
