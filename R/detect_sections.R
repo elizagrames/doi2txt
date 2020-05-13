@@ -79,7 +79,7 @@ remove_junk <- function(text, min_char=50){
 
 # Functions to subset out the sections once they are detected ####
 
-extract_section <- function(text, section, max_lines=10, clean=TRUE) {
+extract_section <- function(text, section, max_lines=10, clean=TRUE, min_words=10) {
   endline <- NA
 
   # removes a bunch of random lines at the start and end of a document that are less than 50 characters, most of which are menu items
@@ -88,6 +88,15 @@ if(clean){
   text <- doi2txt::remove_junk(text)
 }
   headers <- doi2txt::detect_sections(text)
+
+  # check that things go in the right order
+  tmp <- headers[!is.na(headers)]
+
+  for(i in 2:length(tmp)){
+    if(any(tmp[i] < tmp[1:i])){
+      headers[names(tmp[i])] <- NA
+    }
+  }
 
   startpoint <- headers[which(names(headers)==section)]
   endpoint <- headers[which(names(headers)==section)+1]-1
@@ -102,5 +111,13 @@ if(clean){
       "Unable to identify the end of ", section, ", returning ", max_lines, " lines following the start of ", section, ".", sep = ""
     ))
     }
-    text[startpoint:endpoint]
+
+  output <- text[startpoint:endpoint]
+
+  wc <- unlist(lapply(output, function(x){
+    length(strsplit(x, " ")[[1]])
+  }))
+
+  output <- output[wc>min_words]
+
 }
