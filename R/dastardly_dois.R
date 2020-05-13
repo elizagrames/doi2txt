@@ -8,22 +8,17 @@
 #' @return A list of dois
 #data not all publications but might be useful in future (and for Living Norway)
 #devtools::install_github("ropensci/rdatacite")
-
 get_dastardly_dois <- function(limit) {
-library('rdatacite')
-library(tidyverse)
 
-dois_list=dc_dois(#query = "birds",
-  #sample_size = 1000,
+dois_list=rdatacite::dc_dois(
   limit = limit, random=TRUE)
+
 pub_dois<-dois_list$data$attributes
 
-pub_dois<-pub_dois %>%
-  filter(pub_dois$types$schemaOrg=="ScholarlyArticle")
+pub_dois<-pub_dois[pub_dois$types$schemaOrg=="ScholarlyArticle",]
 
-pub_dois<-pub_dois %>% select(doi)
+pub_dois$doi
 
-pub_dois<-as.list(pub_dois$doi)
 }
 
 #some_dois<-get_dastardly_dois(limit=1000)
