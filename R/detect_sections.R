@@ -75,7 +75,15 @@ extract_section <- function(text, section) {
         "Unable to identify the end of", section, sep = ""
       )))
     }
-    text[start:end]
+    output <- text[start:end]
+
+    if(section=="references"){
+# remove lines that don't have a 1 or 2 since those will appear in basically any reference publication year
+      # some things still sneak in, but this should deal with most issues
+      output <- output[sort(unique(c(grep(1, output), grep(2, output))))]
+    }
+
+    return(output)
   } else{
     NA
   }
