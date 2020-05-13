@@ -14,18 +14,21 @@ find_section <- function(section, text) {
   lookup <- unlist(sections[which(names(sections) == section)])
 
   # figure out which lines match to the terms and how many characters they differ by
-  candidates <- lapply(lookup, function(x) {
+  candidates <- data.frame(lapply(lookup, function(x) {
     z <- grep(x, text, ignore.case = TRUE)
-    rbind(z, nchar(text[z]) - nchar(x))
-  })
-
-  # extract only the best match for each term in the lookup vector
-  best_guesses <- data.frame(lapply(candidates, function(x) {
-    x[, which.min(x[2, ])]
+    rbind(z, nchar(trimws(tm::removeNumbers(tm::removePunctuation(text[z])))) - nchar(x))
   }))
 
+
+  # extract only the best match for each term in the lookup vector
+  best_guesses <- candidates[1, which(candidates[2,]==min(candidates[2,]))]
+
+if(length(best_guesses)>1){
+  header <- best_guesses[length(best_guesses)]
+}
+  # check for identical headers
+
   # return the line number of the line that has the closest nchar to the lookup vector
-  header <- best_guesses[1, which.min(best_guesses[2, ])]
   if (length(header) == 0) {
     header <- NA
   }
@@ -58,6 +61,10 @@ detect_sections <- function(text) {
 # Functions to subset out the sections once they are detected ####
 
 extract_section <- function(text, section) {
+  if(section=="abstract"){
+    output <- doi2txt::get_abstract(text)
+  }else{
+
   start <- doi2txt::find_section(section, text)
   if (!is.na(start)) {
     next_section <-
@@ -67,7 +74,9 @@ extract_section <- function(text, section) {
     # e.g. where do you cut off the methods section if you could not find results?
     if (next_section %in% names(sections)) {
       end <- doi2txt::find_section(next_section, text) - 1
-    } else{
+    } else if(section=="abstract"){
+
+    }else{
       end <- length(text)
     }
     if (is.na(end)) {
@@ -82,9 +91,9 @@ extract_section <- function(text, section) {
       # some things still sneak in, but this should deal with most issues
       output <- output[sort(unique(c(grep(1, output), grep(2, output))))]
     }
-
-    return(output)
   } else{
-    NA
+    output <- NA
   }
+  }
+  return(output)
 }
