@@ -4,10 +4,10 @@
 #' @param type A string of length 1 indicating the type of document from which to return dois
 #' @return A character vector of dois
 #' @example get_dastardly_dois(limit=10)
-get_dastardly_dois <- function(limit, type="ScholarlyArticle") {
+get_dastardly_dois <- function(limit, type="ScholarlyArticle", keywords="bird") {
 if(requireNamespace("rdatacite", quietly = TRUE)){
   dois_list=rdatacite::dc_dois(
-    limit = limit, random=TRUE)
+    limit = limit, random=TRUE, query = keywords)
 
   pub_dois<-dois_list$data$attributes
 

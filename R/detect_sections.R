@@ -59,11 +59,11 @@ detect_sections <- function(text) {
 
 
 remove_junk <- function(text, min_char=50){
-  actual_content <- which(nchar(text)>min_char & !grepl("cookie", text))
-  startpoint <- min(actual_content[1]-1, actual_content)
-  endpoint <- max(actual_content[length(actual_content)]+1, actual_content)
+    actual_content <- which(nchar(text)>min_char & !grepl("cookie", text))
+    startpoint <- min(actual_content[1]-1, actual_content)
+    endpoint <- max(actual_content[length(actual_content)]+1, actual_content)
 
-  text[startpoint:endpoint]
+    text[startpoint:endpoint]
 }
 
 
@@ -79,9 +79,11 @@ remove_junk <- function(text, min_char=50){
 
 # Functions to subset out the sections once they are detected ####
 
-extract_section <- function(text, section, max_lines=10, clean=TRUE, min_words=10) {
+extract_section <- function(text, section, max_lines=10, clean=TRUE, min_words=10, forcestart=FALSE) {
   endline <- NA
-
+if(class(text)!="character"){
+  stop("Please provide a valid character vector of text.")
+}
   # removes a bunch of random lines at the start and end of a document that are less than 50 characters, most of which are menu items
   # otherwise, the "start" of each section is consecutive lines in a menu
 if(clean){
@@ -91,10 +93,11 @@ if(clean){
 
   # check that things go in the right order
   tmp <- headers[!is.na(headers)]
-
-  for(i in 2:length(tmp)){
-    if(any(tmp[i] < tmp[1:i])){
-      headers[names(tmp[i])] <- NA
+  if(length(tmp)>1){
+    for(i in 2:length(tmp)){
+      if(any(tmp[i] <= tmp[1:(i-1)])){
+        headers[names(tmp[i])] <- NA
+      }
     }
   }
 
@@ -102,8 +105,13 @@ if(clean){
   endpoint <- headers[which(names(headers)==section)+1]-1
 
   if(is.na(startpoint)){
-    stop(paste("Unable to identify start of", section))
+    if(!forcestart){
+      stop(paste("Unable to identify start of", section))
+    }else{
+      startpoint <- 1
   }
+  }
+
 
   if(is.na(endpoint)){
     endpoint <- startpoint+max_lines

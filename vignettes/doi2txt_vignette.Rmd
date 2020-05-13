@@ -46,79 +46,30 @@ library(doi2txt)
 #dois <- dois[!is.na(dois)]
 
 # results of running the above code; the function is random so now we have persistent dois
-dois <- c("10.3204/pubdb-2018-01257", "10.1002/hpm.2581", "10.1093/isq/sqz012", 
-"10.14358/pers.82.12.955", "10.5169/seals-129753", "10.1016/j.socscimed.2014.08.028", 
-"10.1371/journal.pone.0182528", "10.14288/1.0185192", "10.11588/ger.1954.45177", 
-"10.1021/acs.jctc.9b00741", "10.4067/s0716-97602005000400002", 
-"10.1088/1361-6404/ab1a52", "10.22004/ag.econ.28524", "10.1016/j.bioelechem.2010.06.009", 
-"10.15122/isbn.978-2-8124-3963-6.p.0595", "10.3390/app8112059", 
-"10.1006/jasc.1998.0331", "10.1111/j.1365-2958.2006.05102.x", 
-"10.13140/rg.2.2.16078.61764", "10.1016/j.wneu.2019.08.001", 
-"10.1242/dev.086900", "10.1039/b314760f", "10.21980/j8j01x", 
-"10.5281/zenodo.3819156", "10.17863/cam.48292", "10.1080/15374416.2019.1678167", 
-"10.18634/sophiaj.13v.2i.571", "10.5281/zenodo.1316690", "10.5169/seals-449734", 
-"10.3929/ethz-b-000227178", "10.1109/robot.2006.1642310", "10.1016/j.neuron.2010.08.002", 
-"10.1016/j.jfma.2018.05.010", "10.1038/35084593", "10.1016/j.neuron.2008.01.019", 
-"10.1007/s11071-019-04851-8", "10.1007/s10811-010-9590-y", "10.1159/000486772", 
-"10.15463/rec.1189731477", "10.1111/joac.12271", "10.1248/cpb.50.935", 
-"10.1063/1.3487748", "10.17192/ep1991.2.5451", "10.1016/j.tetlet.2018.03.061", 
-"10.24411/2500-2872-2018-10015", "10.24411/2618-9674-2019-10008", 
-"10.1080/00958972.2014.885508", "10.18540/revesvl2iss2pp0160-0174"
-)
+dois <- c("10.5281/zenodo.1418716", "10.22004/ag.econ.22278", "10.5281/zenodo.2575479", 
+"10.23670/irj.2018.78.12.035", "10.22004/ag.econ.22830", "10.22004/ag.econ.131625", 
+"10.5281/zenodo.1285283", "10.24425/pjvs.2019.129980", "10.22004/ag.econ.263729", 
+"10.13140/rg.2.2.30224.51207", "10.15463/rec.1189734208", "10.22004/ag.econ.159552", 
+"10.1364/oe.26.031454", "10.1080/17454832.2017.1317004", "10.5281/zenodo.3548042", 
+"10.1177/104438942800800901", "10.1016/j.shpsa.2010.10.009", 
+"10.4225/03/58b7790604715")
 
-articles <- lapply(dois[1:3], doi2html)
-
-methods <- lapply(articles, extract_section, section="methods")
-
-references <- lapply(articles, extract_section, section="references")
-
-abstracts <- lapply(articles, extract_section, section="introduction")
-
-```
-
-# Behind the scenes example
-
-This section is intended for troubleshooting since it goes through all the subfunctions that are called above so we can see where things break down. If one line runs, then the next line should theoretically run since the subfunctions have been checked, but who knows what fun errors I have introduced.
-
-```{r}
-# just using article #1 here
-
-# first, the guts of doi2html
-
-url <- get_url(dois[1])
-
-x <- htm2txt::gettxt(url)
-
-class(x)=="character"
-
-x <- split_lines(x)
-
- if (any(x == "")) {
-    x <- x[-which(x == "")] # remove blank lines
- }
-
-articles <- x
+# doi 11 is philosophy or something, fine that functions act weird
+# doi 12 needs the redirect fix to full text
 
 
-# now for extract_section
+i <- i +1
 
-text <- articles
-section="methods"
-# I couldnt run this without adding in section = "methods" "Error in which(names(sections) == section) : object 'section' not found"
+article <- doi2html(dois[i])
+head(article, 10)
 
-start <- find_section(section, text)
+abstract <- extract_section(article, section = "abstract", max_lines = 1, clean=TRUE, min_words = 50, forcestart = TRUE)
+abstract
 
-#start <- find_section("methods", text) # replaced methods with section
+methods <- extract_section(article, section = "methods", max_lines = 50, clean=TRUE, min_words=1, forcestart = FALSE)
+methods
 
-next_section <- names(sections)[(which(names(doi2txt::sections) == section) + 1)]
-
-if (next_section %in% names(sections)) {
-      end <- find_section(next_section, text) - 1
-    } else{
-      end <- length(text)
-    }
-    
-text[start:end]
+rm(abstract, methods, article)
 
 ```
 
@@ -139,6 +90,8 @@ The third doi (10.1016/j.cja.2014.04.019) leads to a paywalled HTML. The full te
 ## No HTML available
 
 The fourth doi (10.24843/EJA.2019.v26.i01.p07) leads to an abstract but no HTML full text, just a PDF. It's for a rather obscure Indonesian language journal, so low priority.
+
+A related issue: some DOIs (e.g. 10.23670/irj.2018.78.12.035) lead directly to a PDF and the download function fails because it expects html. We may be able to fix this by checking the redirect from doi.org and throwing in an error if the extension is .pdf. Or, they are html with an embedded PDF (e.g. 10.1177/104438942800800901).
 
 ## Mini-sections in the abstract
 
