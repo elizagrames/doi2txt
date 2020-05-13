@@ -32,7 +32,7 @@ if(length(best_guesses)>1){
   if (length(header) == 0) {
     header <- NA
   }
-  return(header)
+  return(as.numeric(header))
 }
 
 #' Detect all major section headers in plain text journal articles
@@ -60,31 +60,32 @@ detect_sections <- function(text) {
 
 # Functions to subset out the sections once they are detected ####
 
-extract_section <- function(text, section) {
+extract_section <- function(text, section, max_lines=10) {
+  endline <- NA
   if(section=="abstract"){
     output <- doi2txt::get_abstract(text)
   }else{
 
-  start <- doi2txt::find_section(section, text)
-  if (!is.na(start)) {
+  startline <- doi2txt::find_section(section, text)
+  if (!is.na(startline)) {
     next_section <-
       names(sections)[(which(names(doi2txt::sections) == section) + 1)]
 
     # gonna need to make this more flexible for sections that were not detected in a document
     # e.g. where do you cut off the methods section if you could not find results?
     if (next_section %in% names(sections)) {
-      end <- doi2txt::find_section(next_section, text) - 1
-    } else if(section=="abstract"){
-
-    }else{
-      end <- length(text)
+      endline <- doi2txt::find_section(next_section, text) - 1
     }
-    if (is.na(end)) {
-      stop(print(paste(
-        "Unable to identify the end of", section, sep = ""
-      )))
+    if(section=="references"){
+      endline <- length(text)
     }
-    output <- text[start:end]
+    if (is.na(endline)) {
+      endline <- startline+max_lines
+      print(paste(
+        "Unable to identify the end of", section, "returning", max_lines, "lines following the start of", section, sep = " "
+      ))
+    }
+    output <- text[startline:endline]
 
     if(section=="references"){
 # remove lines that don't have a 1 or 2 since those will appear in basically any reference publication year
