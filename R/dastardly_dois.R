@@ -5,14 +5,15 @@
 #' @return A character vector of dois
 #' @example get_dastardly_dois(limit=10)
 get_dastardly_dois <- function(limit, type="ScholarlyArticle") {
+if(requireNamespace("rdatacite", quietly = TRUE)){
+  dois_list=rdatacite::dc_dois(
+    limit = limit, random=TRUE)
 
-dois_list=rdatacite::dc_dois(
-  limit = limit, random=TRUE)
+  pub_dois<-dois_list$data$attributes
 
-pub_dois<-dois_list$data$attributes
+  pub_dois<-pub_dois[pub_dois$types$schemaOrg==type,]
 
-pub_dois<-pub_dois[pub_dois$types$schemaOrg==type,]
+  return(pub_dois$doi)
 
-return(pub_dois$doi)
-
+}else{stop(print("rdatacite is needed to get dastardly dois."))}
 }
