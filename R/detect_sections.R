@@ -19,19 +19,23 @@ find_section <- function(section, text) {
     rbind(z, nchar(trimws(tm::removeNumbers(tm::removePunctuation(text[z])))) - nchar(x))
   }))
 
-
+if(length(candidates)>0){
   # extract only the best match for each term in the lookup vector
   best_guesses <- candidates[1, which(candidates[2,]==min(candidates[2,]))]
 
-if(length(best_guesses)>1){
-  header <- best_guesses[length(best_guesses)]
-}
-  # check for identical headers
-
-  # return the line number of the line that has the closest nchar to the lookup vector
+  if(length(best_guesses)>1){
+    header <- best_guesses[length(best_guesses)]
+  }
   if (length(header) == 0) {
     header <- NA
   }
+  # check for identical headers
+}else{
+  header <- NA
+}
+
+  # return the line number of the line that has the closest nchar to the lookup vector
+
   return(as.numeric(header))
 }
 
