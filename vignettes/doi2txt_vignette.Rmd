@@ -56,12 +56,23 @@ dois <- c("10.5281/zenodo.1418716", "10.22004/ag.econ.22278", "10.5281/zenodo.25
 
 # doi 11 is philosophy or something, fine that functions act weird
 # doi 12 needs the redirect fix to full text
+article <- abstract <- methods <- list()
 
+for(i in 1:2){
+  
+article[[i]] <- doi2html(dois[i])
+head(article[[i]], 10)
+
+abstract[[i]] <- try(extract_section(article[[i]], section = "abstract", max_lines = 1, clean=TRUE, min_words = 50, forcestart = TRUE))
+
+methods[[i]] <- try(extract_section(article[[i]], section = "methods", max_lines = 50, clean=TRUE, min_words=1, forcestart = FALSE))
+}
 
 i <- i +1
 
 article <- doi2html(dois[i])
 head(article, 10)
+
 
 abstract <- extract_section(article, section = "abstract", max_lines = 1, clean=TRUE, min_words = 50, forcestart = TRUE)
 abstract

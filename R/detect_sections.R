@@ -11,38 +11,44 @@
 #' @param text A character vector containing the plain text of a journal article where each line represents one paragraph separated by line breaks.
 #' @return An integer containing the line number of the text that is most likely the start of the section.
 find_section <- function(section, text) {
-  lookup <- unlist(sections[which(names(sections) == section)])
-
-  # figure out which lines match to the terms and how many characters they differ by
-  candidates <- data.frame(lapply(lookup, function(x) {
-    z <- grep(x, text, ignore.case = TRUE)
-    rbind(z, nchar(trimws(tm::removeNumbers(tm::removePunctuation(text[z])))) - nchar(x))
-  }))
-
-if(length(candidates)>0){
-  # extract only the best match for each term in the lookup vector
-  if(section=="abstract"){
-    best_guesses <- candidates[1,1] # always take the first instance for abstracts
+  if(class(text)!="character"){
+    warning("Please provide a valid character vector of text.")
+    return(NA)
   }else{
-    best_guesses <- candidates[1, which(candidates[2,]==min(candidates[2,]))]
+    lookup <- unlist(sections[which(names(sections) == section)])
+
+    # figure out which lines match to the terms and how many characters they differ by
+    candidates <- data.frame(lapply(lookup, function(x) {
+      z <- grep(x, text, ignore.case = TRUE)
+      rbind(z, nchar(trimws(tm::removeNumbers(tm::removePunctuation(text[z])))) - nchar(x))
+    }))
+
+    if(length(candidates)>0){
+      # extract only the best match for each term in the lookup vector
+      if(section=="abstract"){
+        best_guesses <- candidates[1,1] # always take the first instance for abstracts
+      }else{
+        best_guesses <- candidates[1, which(candidates[2,]==min(candidates[2,]))]
+      }
+
+      if(length(best_guesses)>1){
+        header <- best_guesses[length(best_guesses)]
+      }else{
+        header <- best_guesses
+      }
+      if (length(header) == 0) {
+        header <- NA
+      }
+      # check for identical headers
+    }else{
+      header <- NA
+    }
+
+    # return the line number of the line that has the closest nchar to the lookup vector
+
+    return(as.numeric(header))
   }
 
-  if(length(best_guesses)>1){
-    header <- best_guesses[length(best_guesses)]
-  }else{
-    header <- best_guesses
-  }
-  if (length(header) == 0) {
-    header <- NA
-  }
-  # check for identical headers
-}else{
-  header <- NA
-}
-
-  # return the line number of the line that has the closest nchar to the lookup vector
-
-  return(as.numeric(header))
 }
 
 #' Detect all major section headers in plain text journal articles
@@ -50,6 +56,7 @@ if(length(candidates)>0){
 #' @param text A character vector containing a scientific journal article in plain text format where each line represents one paragraph, section header, or other type of standalone text (e.g. a figure caption).
 #' @return A numeric vector of length 5 indicating the lines within the text that are the section headers for the introduction, methods, results, discussion, and literature cited sections, respectively.
 detect_sections <- function(text) {
+  starts <- NA
   starts <- try(unlist(lapply(names(sections), function(x) {
     doi2txt::find_section(x, text)
   })))
@@ -82,13 +89,12 @@ remove_junk <- function(text, min_char=50){
 extract_section <- function(text, section, max_lines=10, clean=TRUE, min_words=10, forcestart=FALSE) {
   endline <- NA
 if(class(text)!="character"){
-  stop("Please provide a valid character vector of text.")
-}
-  # removes a bunch of random lines at the start and end of a document that are less than 50 characters, most of which are menu items
-  # otherwise, the "start" of each section is consecutive lines in a menu
-if(clean){
-  text <- doi2txt::remove_junk(text)
-}
+  warning("Please provide a valid character vector of text.")
+  return(NA)
+}else{
+  if(clean){
+    text <- doi2txt::remove_junk(text)
+  }
   headers <- doi2txt::detect_sections(text)
 
   # check that things go in the right order
@@ -106,10 +112,10 @@ if(clean){
 
   if(is.na(startpoint)){
     if(!forcestart){
-      stop(paste("Unable to identify start of", section))
+      warning(paste("Unable to identify start of ", section, ", returning NA.", sep=""))
     }else{
       startpoint <- 1
-  }
+    }
   }
 
 
@@ -118,7 +124,7 @@ if(clean){
     warning(paste(
       "Unable to identify the end of ", section, ", returning ", max_lines, " lines following the start of ", section, ".", sep = ""
     ))
-    }
+  }
 
   output <- text[startpoint:endpoint]
 
@@ -127,5 +133,8 @@ if(clean){
   }))
 
   output <- output[wc>min_words]
+}
+  # removes a bunch of random lines at the start and end of a document that are less than 50 characters, most of which are menu items
+  # otherwise, the "start" of each section is consecutive lines in a menu
 
 }

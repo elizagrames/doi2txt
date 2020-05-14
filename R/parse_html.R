@@ -10,23 +10,26 @@
 #' @return A character vector containing the plain text version of the input html document with paragraphs in separate lines.
 parse_html <- function(html = NULL, url = NULL) {
   if (is.null(html) & is.null(url)) {
-    stop(print("Either an html text file or a url must be supplied."))
-  }
-  try(if (is.null(html)) {
-    x <- htm2txt::gettxt(url)
-  } else{
-    if(length(html)>1){
-      html <- paste(html, collapse=" ")
-    }
-    x <- htm2txt::htm2txt(html)
-  })
+    warning(print("Either an html text file or a url must be supplied; returning NA."))
+    return(NA)
+  }else{
+    try(if (is.null(html)) {
+      x <- htm2txt::gettxt(url)
+    } else{
+      if(length(html)>1){
+        html <- paste(html, collapse=" ")
+      }
+      x <- htm2txt::htm2txt(html)
+    })
 
-  if (class(x) != "character") {
-    site <- NA
-  } else{
-    site <- doi2txt::clean_html(x)
+    if (class(x) != "character") {
+      site <- NA
+    } else{
+      site <- doi2txt::clean_html(x)
+    }
+    return(site)
   }
-  return(site)
+
 }
 
 # internal function to remove junk lines that appear when converting html to text
