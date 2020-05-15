@@ -15,7 +15,7 @@ find_section <- function(section, text) {
     warning("Please provide a valid character vector of text.")
     return(NA)
   }else{
-    lookup <- unlist(sections[which(names(sections) == section)])
+    lookup <- unlist(doi2txt::sections[which(names(doi2txt::sections) == section)])
 
     # figure out which lines match to the terms and how many characters they differ by
     candidates <- data.frame(lapply(lookup, function(x) {
