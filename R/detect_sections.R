@@ -57,10 +57,10 @@ find_section <- function(section, text) {
 #' @return A numeric vector of length 5 indicating the lines within the text that are the section headers for the introduction, methods, results, discussion, and literature cited sections, respectively.
 detect_sections <- function(text) {
   starts <- NA
-  starts <- try(unlist(lapply(names(sections), function(x) {
+  starts <- try(unlist(lapply(names(doi2txt::sections), function(x) {
     doi2txt::find_section(x, text)
   })))
-  names(starts) <- names(sections)
+  names(starts) <- names(doi2txt::sections)
   return(starts)
 }
 
