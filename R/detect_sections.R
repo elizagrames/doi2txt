@@ -112,7 +112,7 @@ if(class(text)!="character"){
 
   if(is.na(startpoint)){
     if(!forcestart){
-      warning(paste("Unable to identify start of ", section, ", returning NA.", sep=""))
+      warning(paste("Unable to identify start of ", section, ", returning NA. Consider using forcestart=TRUE if extracting abstracts.", sep=""))
     }else{
       startpoint <- 1
     }
@@ -126,15 +126,13 @@ if(class(text)!="character"){
     ))
   }
 
-  output <- text[startpoint:endpoint]
+  if(any(is.na(startpoint), is.na(endpoint))){
+    return(NA)
+    }else{
+      return(text[startpoint:endpoint])
+             }
 
-  wc <- unlist(lapply(output, function(x){
-    length(strsplit(x, " ")[[1]])
-  }))
-
-  output <- output[wc>min_words]
 }
   # removes a bunch of random lines at the start and end of a document that are less than 50 characters, most of which are menu items
   # otherwise, the "start" of each section is consecutive lines in a menu
-
 }
