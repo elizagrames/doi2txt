@@ -9,26 +9,30 @@
 
 # Geocoding study sites ####
 
+
 #get dataframe of countries mentioned in article section
+
 get_countries_fr_section<-function(section){
 library(tidyverse)
 library(maps)
 ## Loading country data from package maps
 data(world.cities)
+all_countries <- str_c(unique(world.cities$country.etc), collapse = "|")
 ###Remove punctuation
 raw <- gsub("[[:punct:]\n]","",section)
-# Split data at word boundaries
-raw2 <- strsplit(raw, " ")
-# Match on country in world.countries
-CountryList_raw <- (lapply(raw2, function(x)x[which(toupper(x) %in% toupper(world.cities$country.etc))]))
-plyr::ldply(CountryList_raw, rbind)
+
+CountryList_raw<-sapply(str_extract_all(raw, all_countries), toString)
+str(CountryList_raw)
+
+as_tibble(CountryList_raw)
 }
-##Examples
-##get a dataframe of all the countries from the methods section
-#get_countries_fr_section(methods)
-##get a dataframe of all the countries from the all sections
-#get_countries_fr_section(articles)
-## Current challenges - countries with two part names "South Africa", "South Korea", etc. get omitted because of the strsplit - do I need to do this??
-                           
+# #Get countries from methods section
+# get_countries_fr_section(methods)
+# #Get countried from articles
+# get_countries_fr_section(articles)
+# 
+# #Challenges - What should be the output from this - at the moment it is a chr value in a tibble
+# #e.g. "Brazil, Brazil, Brazil, Brazil, Brazil, Venezuela, Venezuela, Colombia, Guyana, Brazil, Guyana" 
+# #I want to find a way to group countries together and then count the number of times each is recorded            
 
 # Coding features from an ontology ####
