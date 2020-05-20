@@ -57,4 +57,37 @@ get_cities_fr_section<-function(section){
 # 
 # #Challenges - As above - how best to output this. For geocode we probably need a unique list of cities in each row. Also it brings in lots of cities that are just nonsense (in the paper not in the real world)
 
+## Takes the output from get_countries_fr_section() and returns dataframe with coordinates (I need to tidy up the output from the get_countries_fr_section() function)
+get_country_location<-function(x, username){
+  if(missing(username)) stop('Please input your geonames users name - make sure you have enabled webservices at https://www.geonames.org')
+  
+dat=x
+dat %>% 
+  rowid_to_column() %>%
+  mutate(Country = strsplit(value, ",")) %>%
+  unnest(Country) %>%
+  select(c(rowid,Country)) %>% 
+  group_by(rowid) %>% 
+  mutate(Country=str_trim(Country, side ="both")) %>% 
+  distinct()->dat
+
+
+library(countrycode)
+library(geonames)
+
+
+options(geonamesUsername=username)
+
+dat %>% 
+  mutate(CountryCode=countrycode(Country, origin = 'country.name', destination = 'iso2c')) %>% 
+  group_by(Country) %>% 
+  mutate(north=geonames::GNcountryInfo(CountryCode)$north) %>% 
+  mutate(east=geonames::GNcountryInfo(CountryCode)$east)
+
+}
+##Example
+#countries<-get_countries_fr_section(methods)
+#get_country_location(countries, username)
+
+
 # Coding features from an ontology ####
