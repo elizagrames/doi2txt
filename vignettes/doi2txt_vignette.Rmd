@@ -30,13 +30,15 @@ Relatedly, how tidy do we want to be? Assuming this gets wrapped up in the metav
 
 When working with scraped data, we will inevitably encounter lots of errors that we did not plan for and are not built into the functions to cope with. My suggestion for this, which is currently implemented in a couple functions, is to use try() to catch error messages, and then replace any resulting error messages with NA. Does anyone know of better approaches for this problem?
 
+Gabby:: we can use tryCatch() which allows us to set different actions for warnings, msgs, errors, and interrupts. And it also lets us make more informative error messages. 
+
+
 
 # "Clean" example that makes use of wrapper functions
 
 This first section is the "clean" version of the first few steps in the package, meaning it uses the wrapper functions which is presumably what most users will want to do. The idea for this section is just to have some example DOIs, download the associated HTML journal articles, and extract the methods and references.
 
 ```{r}
-
 library(doi2txt)
 
 # Example DOIs used for function testing
